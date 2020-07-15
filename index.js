@@ -94,6 +94,7 @@ module.exports.format = function(meta) {
 
 module.exports.save = function(meta) {
   fs.writeFileSync(module.exports.getFileLocation(), module.exports.format(meta));
+};
 
 initMetaBranchMap = function(meta) {
   if (meta) {
