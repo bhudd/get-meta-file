@@ -54,7 +54,7 @@ module.exports = function(options = {}) {
 
   try {
     debug(`attempting to load .meta file with module.exports format at ${metaPath}`); // prettier-ignore
-    const meta = require(metaPath);
+    const meta = initMetaBranchMap(require(metaPath));
     debug(`.meta file found at ${metaPath}`);
     if (meta) return meta;
   } catch (e) {
@@ -72,7 +72,7 @@ module.exports = function(options = {}) {
 
   if (buffer) {
     try {
-      const meta = JSON.parse(buffer.toString());
+      const meta = initMetaBranchMap(JSON.parse(buffer.toString()));
       debug(`.meta file contents parsed: ${util.inspect(meta, null, Infinity)}`); // prettier-ignore
       return meta;
     } catch (e) {
@@ -94,4 +94,17 @@ module.exports.format = function(meta) {
 
 module.exports.save = function(meta) {
   fs.writeFileSync(module.exports.getFileLocation(), module.exports.format(meta));
+
+initMetaBranchMap = function(meta) {
+  if (meta) {
+    const folders = Object.keys(meta.projects);
+    if (!meta.branches) {
+      meta.branches = {};
+    }
+    while (folders.length) {
+      folder = folders.pop();
+      if (!meta.branches[folder]) meta.branches[folder] = 'master';
+    }
+  }
+  return meta;
 };
